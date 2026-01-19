@@ -1,0 +1,14 @@
+{
+  "name": "microapp-sdk",
+  "version": "1.0.0",
+  "description": "营销通微应用开发 SDK 技能。提供完整的开发规范、API 参考和最佳实践，帮助 AI 快速生成符合规范的微应用代码。",
+  "author": {
+    "name": "Gavin-js",
+    "email": "gavin@example.com",
+    "url": "https://github.com/Gavin-js/microapp-skills-marketplace"
+  },
+  "homepage": "https://github.com/Gavin-js/microapp-skills-marketplace",
+  "repository": "https://github.com/Gavin-js/microapp-skills-marketplace",
+  "license": "MIT",
+  "keywords": ["microapp", "marketing", "sdk", "ai", "lottery", "signin", "survey", "es5"]
+}

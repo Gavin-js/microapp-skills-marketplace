@@ -1,0 +1,25 @@
+{
+  "name": "microapp-skills-marketplace",
+  "owner": {
+    "name": "Gavin-js",
+    "email": "gavin@example.com"
+  },
+  "metadata": {
+    "description": "营销通微应用开发技能市场 - 提供 AI 辅助开发营销微应用的能力",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "microapp-sdk",
+      "description": "营销通微应用开发 SDK 技能。提供完整的开发规范、API 参考和最佳实践。使用此技能可以快速生成符合规范的抽奖、签到、问卷等互动微应用代码。",
+      "version": "1.0.0",
+      "author": {
+        "name": "营销通团队"
+      },
+      "source": "./plugins/microapp-sdk",
+      "category": "development",
+      "tags": ["microapp", "sdk", "lottery", "marketing", "ai"],
+      "keywords": ["微应用", "营销", "抽奖", "签到", "AI开发", "ES5"]
+    }
+  ]
+}
