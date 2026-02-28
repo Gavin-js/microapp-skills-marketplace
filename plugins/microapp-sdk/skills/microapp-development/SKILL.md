@@ -3,9 +3,45 @@ name: microapp-development
 description: 营销通微应用开发技能。使用当开发、调试或部署营销通微应用（抽奖、签到、问卷等）时。提供完整的 ES5 语法规范、API 参考和最佳实践。
 ---
 
-# 营销通微应用开发 Skill (MicroApp Development)
+# 微应用开发 Skill (MicroApp Development)
 
-此 Skill 专为营销通微应用开发设计，提供完整的开发规范、API 参考和最佳实践。
+> **Skill 说明**：此 Skill 专为营销通微应用开发设计，提供完整的开发规范、API 参考和最佳实践。使用此 Skill 可以快速生成符合规范的抽奖、签到、问卷等互动微应用代码。
+
+---
+
+## Skill 元信息
+
+| 属性 | 值 |
+|------|-----|
+| **名称** | `microapp-development` |
+| **版本** | 1.0.1 |
+| **适用场景** | 开发营销通微应用（抽奖、签到、问卷等） |
+| **目标用户** | 前端开发者、AI 编程助手 |
+| **输出格式** | 单个 HTML 文件（ES5 语法） |
+
+---
+
+## 使用说明
+
+### 给 AI 助手的指令
+
+将以下内容发送给 AI 助手（ChatGPT、Claude、通义千问等）：
+
+```
+请使用 microapp-development skill 帮我开发一个 [具体功能，如：会议抽奖] 微应用。
+```
+
+### 给 Skill 的参数
+
+开发微应用时需要指定以下参数：
+
+| 参数 | 说明 | 示例值 |
+|------|------|--------|
+| `appType` | 应用类型 | `lottery`（抽奖）、`signin`（签到）、`survey`（问卷） |
+| `platform` | 目标平台 | `mobile`（移动端）、`web`（PC 端）、`both`（双端） |
+| `designStyle` | 设计风格 | `cyber`（赛博霓虹）、`ink`（东方水墨）、`crystal`（晶体折射）、`celebration`（庆典纸屑） |
+
+---
 
 ## 核心规范
 
@@ -42,6 +78,25 @@ function createUser(name, email) {
   };
 }
 
+// ✅ 立即执行函数
+(function() {
+  var app = {
+    init: function() {
+      console.log('App initialized');
+    }
+  };
+  app.init();
+})();
+
+// ✅ 字符串拼接
+var message = '用户：' + userName + '，您好！';
+
+// ✅ 数组遍历
+var users = [{name: '张三'}, {name: '李四'}];
+for (var i = 0; i < users.length; i++) {
+  console.log(users[i].name);
+}
+
 // ✅ Promise 使用
 FsYxtMicroApp.getCurrentUser().then(function(user) {
   console.log('当前用户：', user.name);
@@ -62,8 +117,14 @@ FsYxtMicroApp.getCurrentUser().then(function(user) {
 
   <!-- 引入 Mock SDK（开发环境） -->
   <script src="https://ceshi112.fspage.com/ec/h5-landing/release/microAppMockSDK.js"></script>
+
+  <style>
+    /* CSS 样式 */
+  </style>
 </head>
 <body>
+  <!-- HTML 结构 -->
+
   <script>
     // JavaScript 代码
   </script>
@@ -74,51 +135,87 @@ FsYxtMicroApp.getCurrentUser().then(function(user) {
 ### 3. SDK 可用性检查
 
 ```javascript
+// 检查 SDK 是否可用
 function isSdkAvailable() {
   return typeof FsYxtMicroApp !== 'undefined';
 }
 
+// 安全的 API 调用封装
 function safeApiCall(apiFunc, fallbackValue) {
   if (isSdkAvailable() && apiFunc) {
     return apiFunc();
   }
   return Promise.resolve(fallbackValue);
 }
+
+// 使用示例
+safeApiCall(FsYxtMicroApp.getCurrentUser, null).then(function(user) {
+  if (user) {
+    console.log('用户：', user.name);
+  } else {
+    console.warn('未获取到用户，请检查 SDK');
+  }
+});
 ```
+
+---
 
 ## API 参考
 
-### CRM 对象操作
+### 数据库操作
 
 ```javascript
 // 创建记录
-FsYxtMicroApp.object.create(objectType, data);
-FsYxtMicroApp.campaignMembers.create(data);
+FsYxtMicroApp.db.create('campaign_members', {
+  name: '张三',
+  phone: '13800138000',
+  status: '已签到',
+  signInTime: Date.now()
+});
 
 // 查询记录
-FsYxtMicroApp.object.query(objectType, query);
-FsYxtMicroApp.campaignMembers.query(query);
+FsYxtMicroApp.db.query('campaign_members', {
+  filter: { status: '已签到' },
+  pageSize: 100,
+  pageNum: 1
+});
 
 // 更新记录
-FsYxtMicroApp.object.update(objectType, id, data);
+FsYxtMicroApp.db.update('campaign_members', 'record_id', {
+  status: '已中奖',
+  isWinner: true,
+  prizeType: '一等奖'
+});
 
 // 删除记录
-FsYxtMicroApp.object.delete(objectType, id);
+FsYxtMicroApp.db.delete('campaign_members', 'record_id');
 ```
 
-### 用户与通讯录
+**活动成员表数据结构（campaign_members）**：
+
+```javascript
+{
+  name: '张三',              // 姓名（必填）
+  phone: '13800138000',     // 手机号（必填）
+  email: 'test@example.com', // 邮箱
+  department: '技术部',      // 部门
+  status: '已签到',         // 状态
+  campaignId: 'cmp_001',    // 活动 ID
+  contactId: 'con_001',     // 联系人 ID
+  signUpTime: 1234567890,   // 报名时间
+  signInTime: 1234567900,   // 签到时间
+  isWinner: false,          // 是否中奖
+  prizeType: null           // 奖项类型
+}
+```
+
+### 用户信息
 
 ```javascript
 // 获取当前用户
 FsYxtMicroApp.getCurrentUser().then(function(user) {
   console.log(user);
-});
-
-// 获取企业通讯录
-FsYxtMicroApp.getAddressBook({
-  departmentId: 'dept_sales',
-  includeSubDept: true,
-  fields: ['id', 'name', 'phone', 'department']
+  // { id: 'user_001', name: '张三', email: '...', phone: '...', department: '...', role: '...' }
 });
 ```
 
@@ -127,9 +224,9 @@ FsYxtMicroApp.getAddressBook({
 ```javascript
 // 广播消息
 FsYxtMicroApp.broadcast({
-  type: 'lottery_result',
-  data: { winner: '张三' },
-  to: 'all'
+  type: 'lottery_result',    // 消息类型（必填）
+  data: { winner: '...' },   // 消息数据
+  to: 'all'  // 接收者：'all'、userId 或 [userId1, userId2, ...]
 });
 
 // 监听消息
@@ -138,25 +235,62 @@ var unsubscribe = FsYxtMicroApp.onMessage(function(message) {
     console.log('中奖者：', message.data.winner);
   }
 });
+
+// 取消监听
+unsubscribe();
+
+// 启动/停止消息轮询（可选）
+FsYxtMicroApp.startMessagePolling(3000);  // 3秒轮询一次
+FsYxtMicroApp.stopMessagePolling();
 ```
 
 ### 数据存储
 
 ```javascript
-// 应用私有数据（localStorage）
-FsYxtMicroApp.storeAppData('key', value);
-var value = FsYxtMicroApp.getAppData('key');
+// 应用私有数据（服务端 KV 存储，跨设备同步，异步操作）
+FsYxtMicroApp.storeAppData('key', value).then(function() {
+  console.log('数据已保存');
+}).catch(function(err) {
+  console.error('保存失败:', err);
+});
 
-// 数据库存储（跨设备同步）
+FsYxtMicroApp.getAppData('key').then(function(value) {
+  console.log('数据:', value);
+}).catch(function(err) {
+  console.error('读取失败:', err);
+});
+
+// 数据库存储（结构化数据，支持复杂查询）
 FsYxtMicroApp.db.create('tableName', data);
 FsYxtMicroApp.db.query('tableName', query);
 FsYxtMicroApp.db.update('tableName', id, data);
 FsYxtMicroApp.db.delete('tableName', id);
 ```
 
+### 其他 API
+
+```javascript
+// 平台判断
+var platform = FsYxtMicroApp.platform;  // 'mobile' 或 'web'
+
+// 埋点上报
+// 查看应用活动
+FsYxtMicroApp.track(2035);
+
+// 参加应用活动
+FsYxtMicroApp.track(2036);
+
+// 参加活动并中奖
+FsYxtMicroApp.track(2036, '中了一等奖');
+```
+
+---
+
 ## 数据模型
 
-### 活动成员 (CampaignMembersObj)
+### 活动成员表 (campaign_members)
+
+> 说明：这是自定义数据表，使用 `FsYxtMicroApp.db.*` API 操作
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
@@ -186,6 +320,18 @@ FsYxtMicroApp.db.delete('tableName', id);
 | `campaignId` | String | ❌ | 活动 ID |
 | `round` | Number | ✅ | 抽奖轮次 |
 | `drawTime` | Number | ✅ | 抽奖时间戳 |
+
+### 奖项配置 (prizes - 应用数据)
+
+```javascript
+[
+  { name: '一等奖', count: 1, prizeName: 'iPhone 15', prizeValue: 5999 },
+  { name: '二等奖', count: 3, prizeName: 'iPad Air', prizeValue: 3999 },
+  { name: '三等奖', count: 10, prizeName: '小米手环', prizeValue: 299 }
+]
+```
+
+---
 
 ## 设计风格
 
@@ -232,6 +378,11 @@ body {
   border-radius: 8px;
   border: 1px solid var(--ink-gold);
 }
+
+.ink-text {
+  color: var(--ink-red);
+  font-weight: bold;
+}
 ```
 
 ### 风格 C：晶体几何折射 (crystal)
@@ -241,6 +392,10 @@ body {
   --bg-color: #ffffff;
   --glass-bg: rgba(255, 255, 255, 0.2);
   --prism-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+body {
+  background: var(--bg-color);
 }
 
 .glass-card {
@@ -259,6 +414,10 @@ body {
   --gold-gradient: linear-gradient(135deg, #f5d061, #e6a04e);
 }
 
+body {
+  background: var(--bg-color);
+}
+
 .festive-button {
   background: var(--gold-gradient);
   color: #fff;
@@ -267,13 +426,17 @@ body {
 }
 ```
 
+---
+
 ## 平台判断
 
 ```javascript
 function getPlatform() {
+  // 优先使用 SDK 判断
   if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.platform) {
     return FsYxtMicroApp.platform;
   }
+  // 降级到屏幕宽度判断
   return window.innerWidth < 768 ? 'mobile' : 'web';
 }
 
@@ -286,7 +449,31 @@ if (platform === 'mobile') {
 }
 ```
 
-## 完整示例：签到功能
+---
+
+## 完整示例：会议现场签到抽奖（双端联动）
+
+> **场景说明**：这是一个完整的会议现场签到抽奖系统，PC端显示大屏供主持人操作，移动端供参会人员签到和互动。
+
+### 功能说明
+
+**PC端（大屏）功能：**
+- 签到用户列表实时显示
+- 互动消息滚动展示
+- 奖项设置管理
+- 抽奖功能（支持多轮抽奖）
+- 签到二维码展示
+- 中奖名单展示
+
+**移动端功能：**
+- 用户签到
+- 互动消息发送
+- 实时接收中奖通知
+
+**双端联动：**
+- 移动端签到后，PC端大屏实时更新用户列表
+- PC端抽奖结果实时推送到移动端
+- 移动端发送互动消息，PC端大屏滚动展示
 
 ```html
 <!DOCTYPE html>
@@ -294,102 +481,490 @@ if (platform === 'mobile') {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>活动签到</title>
+  <title>会议签到抽奖</title>
   <script src="https://ceshi112.fspage.com/ec/h5-landing/release/microAppMockSDK.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .container { max-width: 400px; margin: 0 auto; }
-    button { padding: 12px 24px; font-size: 16px; cursor: pointer; }
-    #result { margin-top: 20px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; }
+
+    /* 移动端样式 */
+    .mobile-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+    .mobile-header { text-align: center; margin-bottom: 30px; }
+    .mobile-header h1 { font-size: 24px; color: #333; }
+    .user-card { background: #f5f5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+    .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    .btn-disabled { background: #ccc; color: #999; cursor: not-allowed; }
+    .message-input { margin-top: 20px; }
+    .message-input textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; min-height: 80px; }
+    .message-list { margin-top: 20px; }
+    .message-item { background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-radius: 8px; font-size: 14px; }
+
+    /* PC端大屏样式 */
+    .pc-container { display: none; height: 100vh; background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%); color: white; }
+    .pc-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(0,0,0,0.3); }
+    .pc-title { font-size: 28px; font-weight: bold; }
+    .pc-stats { display: flex; gap: 40px; font-size: 18px; }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 32px; font-weight: bold; color: #00ffff; }
+    .pc-content { display: flex; height: calc(100vh - 80px); }
+    .pc-left { flex: 1; padding: 20px; overflow-y: auto; }
+    .pc-center { flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .pc-right { flex: 1; padding: 20px; border-left: 1px solid rgba(255,255,255,0.1); }
+    .section-title { font-size: 18px; margin-bottom: 15px; color: #00ffff; }
+    .user-list-item { background: rgba(255,255,255,0.1); padding: 12px; margin-bottom: 8px; border-radius: 6px; font-size: 14px; }
+    .message-scroll { height: 300px; overflow: hidden; position: relative; }
+    .message-scroll-item { padding: 10px; background: rgba(102, 126, 234, 0.3); margin-bottom: 8px; border-radius: 6px; font-size: 14px; animation: slideIn 0.3s ease-out; }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .lottery-area { text-align: center; }
+    .lottery-title { font-size: 48px; margin-bottom: 30px; color: #ffff00; text-shadow: 0 0 20px rgba(255,255,0,0.5); }
+    .winner-display { font-size: 36px; margin: 30px 0; min-height: 100px; color: #00ffff; }
+    .pc-btn { padding: 15px 40px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
+    .btn-lottery { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
+    .btn-qr { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+    .btn-winners { background: linear-gradient(135deg, #fa709a, #fee140); color: white; }
+    .qr-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+    .qr-modal.active { display: flex; }
+    .qr-content { background: white; padding: 30px; border-radius: 10px; text-align: center; }
+    .qr-content img { max-width: 300px; margin: 20px 0; }
+    .winners-list { max-height: 400px; overflow-y: auto; }
+    .winner-item { background: rgba(255,255,255,0.1); padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+    .winner-name { font-size: 24px; color: #ffff00; }
+    .winner-prize { font-size: 16px; color: #00ffff; margin-top: 5px; }
+    .prize-input { background: rgba(255,255,255,0.1); padding: 10px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; color: white; width: 200px; margin-right: 10px; }
+
+    /* 根据平台显示不同界面 */
+    @media (min-width: 768px) {
+      .mobile-container { display: none; }
+      .pc-container { display: block; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>活动签到</h1>
-    <div id="user-info"></div>
-    <button id="signin-btn">签到</button>
-    <div id="result"></div>
+  <!-- 移动端界面 -->
+  <div class="mobile-container" id="mobile-ui">
+    <div class="mobile-header">
+      <h1>🎉 会议签到</h1>
+    </div>
+
+    <div class="user-card" id="user-card">
+      <p style="text-align: center; color: #999;">加载中...</p>
+    </div>
+
+    <button class="btn btn-primary" id="signin-btn">立即签到</button>
+
+    <div class="message-input">
+      <textarea id="message-text" placeholder="发送互动消息到现场大屏..."></textarea>
+      <button class="btn btn-primary" style="margin-top: 10px;" id="send-message-btn">发送消息</button>
+    </div>
+
+    <div class="message-list" id="message-list"></div>
+  </div>
+
+  <!-- PC端大屏界面 -->
+  <div class="pc-container" id="pc-ui">
+    <div class="pc-header">
+      <div class="pc-title">🎊 会议现场抽奖系统</div>
+      <div class="pc-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="signin-count">0</div>
+          <div>已签到</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="winner-count">0</div>
+          <div>中奖人数</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pc-content">
+      <div class="pc-left">
+        <div class="section-title">📋 签到用户列表</div>
+        <div id="pc-user-list"></div>
+      </div>
+
+      <div class="pc-center">
+        <div class="lottery-area">
+          <div class="lottery-title">🎁 抽奖环节</div>
+          <div class="winner-display" id="winner-display">等待抽奖...</div>
+          <button class="pc-btn btn-lottery" id="lottery-btn">开始抽奖</button>
+          <button class="pc-btn btn-qr" id="show-qr-btn">显示签到二维码</button>
+          <button class="pc-btn btn-winners" id="show-winners-btn">中奖名单</button>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <div class="section-title">💬 互动消息</div>
+        <div class="message-scroll" id="pc-message-scroll"></div>
+
+        <div class="section-title" style="margin-top: 30px;">🏆 奖项设置</div>
+        <div style="margin-bottom: 10px;">
+          <input type="text" class="prize-input" id="prize-name" placeholder="奖项名称（如：一等奖）" />
+          <input type="number" class="prize-input" id="prize-count" placeholder="数量" style="width: 100px;" />
+          <button class="pc-btn btn-qr" id="add-prize-btn" style="padding: 10px 20px; font-size: 14px;">添加</button>
+        </div>
+        <div id="prize-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 二维码弹窗 -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-content">
+      <h2>扫码签到</h2>
+      <div id="qr-code"></div>
+      <p style="color: #666; margin-top: 10px;">使用手机扫描二维码签到</p>
+      <button class="btn btn-primary" onclick="document.getElementById('qr-modal').classList.remove('active')" style="margin-top: 20px;">关闭</button>
+    </div>
   </div>
 
   <script>
     (function() {
-      var userInfoDiv = document.getElementById('user-info');
-      var resultDiv = document.getElementById('result');
-      var signinBtn = document.getElementById('signin-btn');
+      var platform = typeof FsYxtMicroApp !== 'undefined' ? FsYxtMicroApp.platform : 'mobile';
       var currentUser = null;
+      var prizes = [];
+      var signedUsers = [];
 
+      // 从URL获取企业ea
+      function getEnterpriseEA() {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('ea') || 'default_ea';
+      }
+
+      // 获取应用ID
+      function getAppId() {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('appId') || 'default_app_id';
+      }
+
+      // ========== 移动端功能 ==========
+
+      // 移动端：加载用户信息
       function loadUser() {
         if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.getCurrentUser) {
           FsYxtMicroApp.getCurrentUser().then(function(user) {
             if (user) {
               currentUser = user;
-              userInfoDiv.innerHTML = '<p>欢迎：' + user.name + '</p>';
+              document.getElementById('user-card').innerHTML = '<h3 style="text-align: center;">' + user.name + '</h3><p style="text-align: center; color: #666;">' + (user.department || '') + '</p>';
               checkSignInStatus();
+              FsYxtMicroApp.track(2035);
             }
           });
         }
       }
 
+      // 移动端：检查签到状态
       function checkSignInStatus() {
-        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.campaignMembers) {
-          FsYxtMicroApp.campaignMembers.query({
-            filter: { phone: currentUser.phone, status: '已签到' }
+        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.query('signed_users', {
+            filter: { field_name: 'phone', operator: 'EQ', field_values: [currentUser.phone] }
           }).then(function(result) {
             if (result.data && result.data.length > 0) {
-              signinBtn.disabled = true;
-              signinBtn.textContent = '已签到';
-              resultDiv.innerHTML = '<p>签到时间：' + new Date(result.data[0].signInTime).toLocaleString() + '</p>';
+              var btn = document.getElementById('signin-btn');
+              btn.textContent = '已签到 ✓';
+              btn.classList.add('btn-disabled');
+              btn.disabled = true;
             }
           });
         }
       }
 
-      signinBtn.addEventListener('click', function() {
-        if (!currentUser) {
-          alert('请先获取用户信息');
-          return;
-        }
+      // 移动端：签到
+      document.getElementById('signin-btn').addEventListener('click', function() {
+        if (!currentUser) return;
 
-        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.campaignMembers) {
-          FsYxtMicroApp.campaignMembers.create({
+        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.create('signed_users', {
             name: currentUser.name,
             phone: currentUser.phone,
-            email: currentUser.email || '',
             department: currentUser.department || '',
-            status: '已签到',
-            campaignId: 'campaign_001',
-            contactId: currentUser.id,
-            signUpTime: Date.now(),
             signInTime: Date.now()
-          }).then(function(result) {
-            signinBtn.disabled = true;
-            signinBtn.textContent = '已签到';
-            resultDiv.innerHTML = '<p>签到成功！</p>';
-            FsYxtMicroApp.track('signin_success', { userId: currentUser.id });
+          }).then(function() {
+            document.getElementById('signin-btn').textContent = '已签到 ✓';
+            document.getElementById('signin-btn').classList.add('btn-disabled');
+            document.getElementById('signin-btn').disabled = true;
+
+            // 广播签到消息
+            FsYxtMicroApp.broadcast({
+              type: 'user_signin',
+              data: { name: currentUser.name, department: currentUser.department || '' }
+            });
+
+            FsYxtMicroApp.track(2036, '签到成功');
+            alert('签到成功！');
           }).catch(function(err) {
-            resultDiv.innerHTML = '<p>签到失败：' + err.message + '</p>';
+            alert('签到失败：' + err.message);
           });
         }
       });
 
-      loadUser();
+      // 移动端：发送互动消息
+      document.getElementById('send-message-btn').addEventListener('click', function() {
+        var textarea = document.getElementById('message-text');
+        var message = textarea.value.trim();
+        if (!message) return;
+
+        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.broadcast) {
+          FsYxtMicroApp.broadcast({
+            type: 'user_message',
+            data: { name: currentUser.name, message: message }
+          }).then(function() {
+            textarea.value = '';
+            addMessageToList(currentUser.name, message);
+          });
+        }
+      });
+
+      // 添加消息到列表
+      function addMessageToList(name, message) {
+        var list = document.getElementById('message-list');
+        var item = document.createElement('div');
+        item.className = 'message-item';
+        item.innerHTML = '<strong>' + name + '：</strong>' + message;
+        list.insertBefore(item, list.firstChild);
+      }
+
+      // ========== PC端功能 ==========
+
+      // PC端：加载签到用户列表
+      function loadSignedUsers() {
+        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.query('signed_users', {
+            orders: [{ field_name: 'signInTime', isAsc: false }],
+            pageSize: 100
+          }).then(function(result) {
+            signedUsers = result.data || [];
+            document.getElementById('signin-count').textContent = signedUsers.length;
+
+            var list = document.getElementById('pc-user-list');
+            list.innerHTML = signedUsers.map(function(user) {
+              return '<div class="user-list-item">' + user.name + ' - ' + (user.department || '未知部门') + '</div>';
+            }).join('');
+          });
+        }
+      }
+
+      // PC端：抽奖
+      document.getElementById('lottery-btn').addEventListener('click', function() {
+        if (signedUsers.length === 0) {
+          alert('暂无签到用户');
+          return;
+        }
+
+        // 随机抽取一个用户
+        var winner = signedUsers[Math.floor(Math.random() * signedUsers.length)];
+        var prize = prizes.length > 0 ? prizes[0] : { name: '幸运奖', count: 999 };
+
+        // 保存中奖记录
+        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.create('winners', {
+            winnerName: winner.name,
+            winnerPhone: winner.phone,
+            prizeName: prize.name,
+            winTime: Date.now()
+          }).then(function() {
+            // 显示中奖结果
+            document.getElementById('winner-display').innerHTML = '🎉 ' + winner.name + '<br><span style="font-size: 24px; margin-top: 20px; color: #ffff00;">' + prize.name + '</span>';
+
+            // 广播中奖消息
+            FsYxtMicroApp.broadcast({
+              type: 'lottery_result',
+              data: { winnerName: winner.name, prizeName: prize.name }
+            });
+
+            FsYxtMicroApp.track(2036, winner.name + ' ' + prize.name);
+
+            // 更新中奖人数
+            loadWinners();
+          });
+        }
+      });
+
+      // PC端：显示二维码
+      document.getElementById('show-qr-btn').addEventListener('click', function() {
+        var appId = getAppId();
+        var ea = getEnterpriseEA();
+        var qrUrl = 'https://crm.ceshi112.com/proj/page/marketing-page/marketing-app.html?ea=' + ea + '&appId=' + appId;
+        document.getElementById('qr-code').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(qrUrl) + '" alt="签到二维码" />';
+        document.getElementById('qr-modal').classList.add('active');
+      });
+
+      // PC端：显示中奖名单
+      document.getElementById('show-winners-btn').addEventListener('click', function() {
+        loadWinners();
+      });
+
+      // PC端：添加奖项
+      document.getElementById('add-prize-btn').addEventListener('click', function() {
+        var nameInput = document.getElementById('prize-name');
+        var countInput = document.getElementById('prize-count');
+        var name = nameInput.value.trim();
+        var count = parseInt(countInput.value);
+
+        if (!name || !count) {
+          alert('请输入奖项名称和数量');
+          return;
+        }
+
+        prizes.push({ name: name, count: count });
+        nameInput.value = '';
+        countInput.value = '';
+
+        updatePrizeList();
+      });
+
+      function updatePrizeList() {
+        var list = document.getElementById('prize-list');
+        list.innerHTML = prizes.map(function(p, i) {
+          return '<div class="user-list-item">' + p.name + ' x' + p.count + '</div>';
+        }).join('');
+      }
+
+      // PC端：加载中奖名单
+      function loadWinners() {
+        if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.query('winners', {
+            orders: [{ field_name: 'winTime', isAsc: false }],
+            pageSize: 100
+          }).then(function(result) {
+            var winners = result.data || [];
+            document.getElementById('winner-count').textContent = winners.length;
+
+            var list = document.getElementById('winners-list');
+            if (list) {
+              list.innerHTML = winners.map(function(w) {
+                return '<div class="winner-item"><div class="winner-name">' + w.winnerName + '</div><div class="winner-prize">' + w.prizeName + '</div></div>';
+              }).join('');
+            }
+          });
+        }
+      }
+
+      // ========== 消息监听（双端） ==========
+
+      if (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.onMessage) {
+        FsYxtMicroApp.onMessage(function(msg) {
+          if (msg.type === 'user_signin') {
+            // PC端收到签到消息
+            if (platform === 'web') {
+              loadSignedUsers();
+            }
+          } else if (msg.type === 'user_message') {
+            // PC端收到互动消息
+            if (platform === 'web') {
+              addScrollMessage(msg.data.name, msg.data.message);
+            }
+          } else if (msg.type === 'lottery_result') {
+            // 移动端收到中奖通知
+            if (platform === 'mobile' && currentUser && msg.data.winnerName === currentUser.name) {
+              alert('🎉 恭喜您获得 ' + msg.data.prizeName + '！');
+            }
+          }
+        });
+      }
+
+      // PC端：添加滚动消息
+      function addScrollMessage(name, message) {
+        var scroll = document.getElementById('pc-message-scroll');
+        var item = document.createElement('div');
+        item.className = 'message-scroll-item';
+        item.innerHTML = '<strong>' + name + '：</strong>' + message;
+        scroll.insertBefore(item, scroll.firstChild);
+
+        // 限制消息数量
+        while (scroll.children.length > 10) {
+          scroll.removeChild(scroll.lastChild);
+        }
+      }
+
+      // ========== 初始化 ==========
+
+      if (platform === 'mobile') {
+        loadUser();
+      } else {
+        loadSignedUsers();
+        loadWinners();
+
+        // PC端定时刷新数据
+        setInterval(loadSignedUsers, 5000);
+      }
     })();
   </script>
 </body>
 </html>
 ```
 
+---
+
 ## Skill 工作流程
 
-当用户请求开发微应用时，按以下步骤进行：
+当用户请求使用此 Skill 时，按以下步骤进行：
 
 ### Step 1: 确认需求
 
-询问用户以下信息：
-1. 应用类型（抽奖/签到/问卷/其他）
-2. 目标平台（移动端/PC 端/双端）
-3. 设计风格偏好（cyber/ink/crystal/celebration）
-4. 特殊功能需求
+> **重要架构说明**：签到和抽奖功能通常在**同一个应用**中实现，通过平台判断（`FsYxtMicroApp.platform`）在同一应用中渲染不同界面：
+> - **移动端界面**（platform: 'mobile'）：供参会人员扫码后签到、互动
+> - **PC端界面**（platform: 'web'）：供主持人操作的抽奖大屏
+> - **双端联动**：通过 `broadcast/onMessage` 实现实时数据同步
+
+#### 1.1 基础信息（必填）
+
+询问用户以下基础信息：
+1. **应用类型**：抽奖 / 签到 / 问卷 / 其他
+2. **目标平台**：
+   - 如果应用类型是【签到】或【抽奖】，默认推荐**双端**（移动端签到 + PC端大屏抽奖）
+   - 如果应用类型是【问卷】或【其他】，可选择：移动端 / PC 端 / 双端
+3. **设计风格**：cyber（赛博霓虹）/ ink（东方水墨）/ crystal（晶体折射）/ celebration（庆典纸屑）（默认：cyber）
+
+> **默认值说明**：
+> - 签到/抽奖类应用：目标平台默认为**双端**（因为需要移动端签到 + PC端大屏的协同）
+> - 其他类型应用：目标平台默认为移动端
+> - 设计风格默认为 cyber（赛博霓虹）
+
+#### 1.2 根据应用类型询问核心信息
+
+**如果应用类型是【抽奖】**（通常包含签到功能），只需要询问：
+- **奖项设置**：有哪些奖项？每个奖项多少名额？（如：一等奖1名、二等奖3名、三等奖10名）
+
+> **默认规则**（行业实践）：
+> - 这是**同一个应用**在双端的展现：移动端签到 + PC端大屏抽奖
+> - 参与人员：所有已签到用户
+> - 抽奖次数：每人只能抽一次
+> - 不允许重复中奖
+> - PC端自动启用大屏展示和抽奖动画
+> - 自动启用移动端↔PC端消息同步（签到通知、中奖广播）
+
+**如果应用类型是【签到】**，只需要询问：
+- 是否需要收集额外信息？（默认：否，只使用当前用户信息）
+
+> **默认规则**（行业实践）：
+> - 每人只能签到一次
+> - 显示已签到人数
+> - 签到成功显示动画
+> - 如果是双端，PC端可查看签到用户列表和实时统计
+
+**如果应用类型是【问卷】**，只需要询问：
+- **问卷内容**：有哪些问题？每个问题的选项是什么？（题类型自动识别）
+
+> **默认规则**（行业实践）：
+> - 所有问题必填
+> - 每人只能提交一次
+> - 需要登录才能提交
+> - 提交后不可修改
+
+**如果应用类型是【其他】**，只需要询问：
+- 请简单描述功能需求（1-2句话即可）
+
+#### 1.3 默认启用的功能（无需询问）
+
+以下功能默认启用，符合行业最佳实践：
+- ✅ SDK 可用性检查
+- ✅ 平台判断（`FsYxtMicroApp.platform`）
+- ✅ 错误处理和用户提示
+- ✅ 埋点上报（查看活动 2035、参与活动 2036）
+- ✅ 响应式布局适配
+- ✅ 数据持久化（使用 db.* API）
+- ✅ 双端消息同步（如果是签到/抽奖类应用）
 
 ### Step 2: 生成代码
 
@@ -407,6 +982,7 @@ if (platform === 'mobile') {
 - ✅ SDK 可用性检查
 - ✅ API 调用正确性
 - ✅ 错误处理完善
+- ✅ 注释清晰完整
 
 ### Step 4: 输出结果
 
@@ -415,10 +991,42 @@ if (platform === 'mobile') {
 2. 使用说明
 3. 注意事项
 
+---
+
+## 调试工具
+
+Mock SDK 提供的调试工具：
+
+```javascript
+// 清空所有模拟数据
+FsYxtMicroAppMockUtils.clearAllData();
+
+// 查看当前存储的所有模拟数据
+var allData = FsYxtMicroAppMockUtils.getAllData();
+console.log(allData);
+
+// 重新初始化 Mock SDK
+FsYxtMicroAppMockUtils.reload();
+```
+
+---
+
 ## 注意事项
 
 1. **生产环境部署**：移除 Mock SDK 引用，使用平台注入的真实 SDK
 2. **跨标签通信**：使用 `FsYxtMicroApp.broadcast()` 和 `onMessage()`
 3. **数据持久化**：重要数据使用 `FsYxtMicroApp.db.*` 存储
-4. **埋点上报**：关键操作使用 `FsYxtMicroApp.track()` 记录
+4. **埋点上报**：关键操作使用 `FsYxtMicroApp.track(actionType, actionDescription)` 记录
+   - 2035：查看应用活动（页面加载时）
+   - 2036：参加应用活动（参与抽奖、签到等）
+   - 有具体结果时传递 actionDescription（如：中了一等奖）
 5. **平台兼容**：始终使用 `FsYxtMicroApp.platform` 判断运行平台
+
+---
+
+## 版本历史
+
+| 版本 | 日期 | 变更说明 |
+|------|------|----------|
+| 1.0.1 | 2026-02-28 | 更新 API：数据库操作改为 db.*，埋点上报具体值，新增双端联动示例，完善工作流程 |
+| 1.0.0 | 2026-01-19 | 初始版本，支持抽奖、签到等基础功能 |
