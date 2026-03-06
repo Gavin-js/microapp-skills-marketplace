@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会议签到抽奖</title>
+
+  <!-- 引入 Mock SDK（开发环境） -->
+  <script src="https://ceshi112.fspage.com/ec/h5-landing/release/microAppMockSDK.js"></script>
+
+  <style>
+    /* ==================== 基础样式 ==================== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; }
+
+    /* ==================== 赛博霓虹风格变量 ==================== */
+    :root {
+      --bg-color: #0a0e27;
+      --bg-gradient: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+      --neon-pink: #ff00ff;
+      --neon-cyan: #00ffff;
+      --neon-yellow: #ffff00;
+      --neon-blue: #00d4ff;
+      --neon-purple: #bf00ff;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-glow: rgba(0, 255, 255, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ==================== 移动端样式 ==================== */
+    .mobile-container {
+      min-height: 100vh;
+      background: var(--bg-color);
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .mobile-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 30px 20px;
+      background: var(--bg-gradient);
+      border-radius: 15px;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    .mobile-header h1 {
+      font-size: 26px;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+      margin-bottom: 10px;
+    }
+
+    .mobile-header p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .user-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+    }
+
+    .user-card h3 {
+      text-align: center;
+      font-size: 22px;
+      color: var(--neon-pink);
+      text-shadow: 0 0 10px var(--neon-pink);
+      margin-bottom: 10px;
+    }
+
+    .user-card p {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan));
+      color: white;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+      animation: neonPulse 2s ease-in-out infinite;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.6);
+    }
+
+    .btn-disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+      animation: none;
+    }
+
+    @keyframes neonPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(0, 255, 255, 0.6); }
+    }
+
+    .message-input {
+      margin-top: 25px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      border: 1px solid var(--border-glow);
+    }
+
+    .message-input textarea {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      min-height: 100px;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 16px;
+      resize: none;
+    }
+
+    .message-input textarea::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .message-input textarea:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .message-input button {
+      margin-top: 15px;
+    }
+
+    .message-list {
+      margin-top: 20px;
+    }
+
+    .message-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 14px;
+      border-left: 3px solid var(--neon-cyan);
+      animation: slideInMobile 0.3s ease-out;
+    }
+
+    @keyframes slideInMobile {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .manual-input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .manual-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .manual-input:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .manual-input:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      cursor: not-allowed;
+    }
+
+    /* ==================== PC端大屏样式 ==================== */
+    .pc-container {
+      display: none;
+      min-height: 100vh;
+      background: var(--bg-gradient);
+      color: white;
+    }
+
+    .pc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 25px 50px;
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid var(--border-glow);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    }
+
+    .pc-title {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 15px var(--neon-cyan);
+    }
+
+    .pc-stats {
+      display: flex;
+      gap: 50px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 42px;
+      font-weight: bold;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 20px var(--neon-yellow);
+    }
+
+    .stat-label {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+
+    .pc-content {
+      display: flex;
+      height: calc(100vh - 120px);
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .pc-left,
+    .pc-center,
+    .pc-right {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 20px;
+      padding: 25px;
+      border: 1px solid var(--border-glow);
+      overflow-y: auto;
+    }
+
+    .pc-left { flex: 1; }
+    .pc-center { flex: 1.2; display: flex; flex-direction: column; align-items: center; }
+    .pc-right { flex: 1; }
+
+    .section-title {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-glow);
+    }
+
+    .user-list-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 16px;
+      border-left: 3px solid var(--neon-pink);
+      animation: slideInPC 0.3s ease-out;
+    }
+
+    @keyframes slideInPC {
+      from { transform: translateX(-30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .lottery-area {
+      text-align: center;
+      width: 100%;
+    }
+
+    .lottery-title {
+      font-size: 52px;
+      margin-bottom: 40px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 30px rgba(255, 255, 0, 0.6);
+      animation: titleGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes titleGlow {
+      0%, 100% { text-shadow: 0 0 30px rgba(255, 255, 0, 0.6); }
+      50% { text-shadow: 0 0 50px rgba(255, 255, 0, 0.9); }
+    }
+
+    .winner-display {
+      font-size: 48px;
+      margin: 40px 0;
+      min-height: 150px;
+      color: var(--neon-cyan);
+      text-shadow: 0 0 20px var(--neon-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .winner-name {
+      font-size: 56px;
+      animation: winnerBounce 0.6s ease-out;
+    }
+
+    @keyframes winnerBounce {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .winner-prize {
+      font-size: 28px;
+      margin-top: 15px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 15px var(--neon-yellow);
+    }
+
+    .pc-btn {
+      padding: 18px 45px;
+      font-size: 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-lottery {
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+      color: white;
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
+      animation: btnPulse 2s ease-in-out infinite;
+    }
+
+    .btn-lottery:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 0 40px rgba(255, 0, 255, 0.6);
+    }
+
+    @keyframes btnPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.4); }
+      50% { box-shadow: 0 0 50px rgba(191, 0, 255, 0.6); }
+    }
+
+    .btn-qr {
+      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+      color: white;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-qr:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    }
+
+    .btn-winners {
+      background: linear-gradient(135deg, #fa709a, #fee140);
+      color: white;
+      box-shadow: 0 0 20px rgba(250, 112, 154, 0.3);
+    }
+
+    .btn-winners:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(250, 112, 154, 0.5);
+    }
+
+    .message-scroll {
+      height: 350px;
+      overflow: hidden;
+      position: relative;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 15px;
+      padding: 15px;
+    }
+
+    .message-scroll-item {
+      padding: 15px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      margin-bottom: 10px;
+      border-radius: 10px;
+      font-size: 16px;
+      border-left: 3px solid var(--neon-cyan);
+      animation: slideInRight 0.4s ease-out;
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .prize-input {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 12px 15px;
+      border: 1px solid var(--border-glow);
+      border-radius: 10px;
+      color: white;
+      margin-right: 10px;
+      font-size: 16px;
+    }
+
+    .prize-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .prize-input:focus {
+      outline: none;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .prize-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border-glow);
+    }
+
+    .prize-name {
+      color: var(--neon-yellow);
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .prize-count {
+      color: var(--neon-cyan);
+      font-size: 16px;
+    }
+
+    /* ==================== 弹窗样式 ==================== */
+    .qr-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-modal.active {
+      display: flex;
+    }
+
+    .qr-content {
+      background: var(--bg-color);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+    }
+
+    .qr-content h2 {
+      color: var(--neon-cyan);
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .qr-content img {
+      max-width: 350px;
+      margin: 20px 0;
+      border: 3px solid var(--neon-cyan);
+      border-radius: 10px;
+    }
+
+    .qr-content p {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .winners-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .winners-modal.active {
+      display: flex;
+    }
+
+    .winners-content {
+      background: var(--bg-color);
+      padding: 40px;
+      border-radius: 20px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 0 50px rgba(0, 255, 255, 0.3);
+    }
+
+    .winners-content h2 {
+      color: var(--neon-cyan);
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .winners-list {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .winner-item {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 15px;
+      text-align: center;
+      border: 1px solid var(--border-glow);
+    }
+
+    .winner-item .winner-name {
+      font-size: 32px;
+      color: var(--neon-yellow);
+      text-shadow: 0 0 15px var(--neon-yellow);
+      margin-bottom: 8px;
+    }
+
+    .winner-item .winner-prize {
+      font-size: 20px;
+      color: var(--neon-cyan);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 0, 0, 0.5);
+      transform: rotate(90deg);
+    }
+
+    /* ==================== 响应式 ==================== */
+    @media (min-width: 768px) {
+      .mobile-container { display: none; }
+      .pc-container { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 移动端界面 -->
+  <div class="mobile-container" id="mobile-ui">
+    <div class="mobile-header">
+      <h1>会议签到抽奖</h1>
+      <p>签到参与抽奖，赢取精美礼品</p>
+    </div>
+
+    <div class="user-card" id="user-card">
+      <p style="text-align: center; color: var(--text-secondary);">加载中...</p>
+    </div>
+
+    <button class="btn btn-primary" id="signin-btn">立即签到</button>
+
+    <div class="message-input">
+      <textarea id="message-text" placeholder="发送互动消息到现场大屏..."></textarea>
+      <button class="btn btn-primary" id="send-message-btn">发送消息</button>
+    </div>
+
+    <div class="message-list" id="message-list"></div>
+  </div>
+
+  <!-- PC端大屏界面 -->
+  <div class="pc-container" id="pc-ui">
+    <div class="pc-header">
+      <div class="pc-title">会议现场抽奖系统</div>
+      <div class="pc-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="signin-count">0</div>
+          <div class="stat-label">已签到</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="winner-count">0</div>
+          <div class="stat-label">中奖人数</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pc-content">
+      <div class="pc-left">
+        <div class="section-title">签到用户列表</div>
+        <div id="pc-user-list"></div>
+      </div>
+
+      <div class="pc-center">
+        <div class="lottery-area">
+          <div class="lottery-title">抽奖环节</div>
+          <div class="winner-display" id="winner-display">
+            <div>等待抽奖...</div>
+          </div>
+          <div>
+            <button class="pc-btn btn-lottery" id="lottery-btn">开始抽奖</button>
+          </div>
+          <div style="margin-top: 20px;">
+            <button class="pc-btn btn-qr" id="show-qr-btn">显示签到二维码</button>
+            <button class="pc-btn btn-winners" id="show-winners-btn">中奖名单</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc-right">
+        <div class="section-title">互动消息</div>
+        <div class="message-scroll" id="pc-message-scroll"></div>
+
+        <div class="section-title" style="margin-top: 30px;">奖项设置</div>
+        <div id="prize-config-area" style="margin-bottom: 10px;">
+          <input type="text" class="prize-input" id="prize-name" placeholder="奖项名称" style="width: 180px;" />
+          <input type="number" class="prize-input" id="prize-count" placeholder="数量" style="width: 100px;" />
+          <button class="pc-btn btn-qr" id="add-prize-btn" style="padding: 12px 25px; font-size: 16px; margin: 0;">添加</button>
+        </div>
+        <div id="prize-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 二维码弹窗 -->
+  <div class="qr-modal" id="qr-modal">
+    <div class="qr-content">
+      <button class="close-btn" onclick="document.getElementById('qr-modal').classList.remove('active')">&times;</button>
+      <h2>扫码签到</h2>
+      <div id="qr-code"></div>
+      <p>使用手机扫描二维码签到</p>
+    </div>
+  </div>
+
+  <!-- 中奖名单弹窗 -->
+  <div class="winners-modal" id="winners-modal">
+    <div class="winners-content">
+      <button class="close-btn" onclick="document.getElementById('winners-modal').classList.remove('active')">&times;</button>
+      <h2>中奖名单</h2>
+      <div class="winners-list" id="winners-list"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ==================== 全局变量 ====================
+      var platform = (typeof FsYxtMicroApp !== 'undefined' && FsYxtMicroApp.platform) ? FsYxtMicroApp.platform : (window.innerWidth < 768 ? 'mobile' : 'web');
+      var currentUser = null;
+
+      // 默认奖项设置
+      var prizes = [
+        { name: '一等奖', count: 1, remaining: 1 },
+        { name: '二等奖', count: 3, remaining: 3 },
+        { name: '三等奖', count: 10, remaining: 10 }
+      ];
+
+      var signedUsers = [];
+      var winners = [];
+
+      // ==================== 工具函数 ====================
+
+      // 从URL获取企业ea
+      function getEnterpriseEA() {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('ea') || 'default_ea';
+      }
+
+      // 获取应用ID
+      function getAppId() {
+        var urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('appId') || 'default_app_id';
+      }
+
+      // 检查SDK是否可用
+      function isSdkAvailable() {
+        return typeof FsYxtMicroApp !== 'undefined';
+      }
+
+      // ==================== 移动端功能 ====================
+
+      // 加载用户信息
+      function loadUser() {
+        if (isSdkAvailable() && FsYxtMicroApp.getCurrentUser) {
+          FsYxtMicroApp.getCurrentUser().then(function(user) {
+            if (user && user.name) {
+              currentUser = user;
+              showUserInfo(user.name, user.userType);
+              checkSignInStatus();
+              if (FsYxtMicroApp.track) {
+                FsYxtMicroApp.track(2035);
+              }
+            } else {
+              showManualInputForm();
+            }
+          }).catch(function() {
+            showManualInputForm();
+          });
+        } else {
+          showManualInputForm();
+        }
+      }
+
+      // 显示用户信息
+      function showUserInfo(name, userType) {
+        var nameInput = document.getElementById('manual-name');
+        var deptInput = document.getElementById('manual-dept');
+
+        if (nameInput && deptInput) {
+          nameInput.value = name;
+          nameInput.disabled = true;
+          deptInput.placeholder = '部门（选填）';
+        } else {
+          var userTypeText = '访客';
+          if (userType === 'employee') {
+            userTypeText = '企业员工';
+          } else if (userType === 'member') {
+            userTypeText = '企业会员';
+          }
+          document.getElementById('user-card').innerHTML =
+            '<h3>' + name + '</h3>' +
+            '<p>' + userTypeText + '</p>';
+        }
+      }
+
+      // 显示手动输入表单
+      function showManualInputForm() {
+        document.getElementById('user-card').innerHTML =
+          '<input type="text" id="manual-name" class="manual-input" placeholder="请输入您的姓名" />' +
+          '<input type="text" id="manual-dept" class="manual-input" placeholder="部门（选填）" />';
+      }
+
+      // 检查签到状态
+      function checkSignInStatus() {
+        if (isSdkAvailable() && FsYxtMicroApp.db) {
+          var userPhone = currentUser ? (currentUser.mobile || currentUser.phone) : null;
+          if (!userPhone) return;
+
+          FsYxtMicroApp.db.query('signed_users', {
+            filter: { field_name: 'phone', operator: 'EQ', field_values: [userPhone] }
+          }).then(function(result) {
+            if (result.data && result.data.length > 0) {
+              var btn = document.getElementById('signin-btn');
+              if (btn) {
+                btn.textContent = '已签到 ✓';
+                btn.classList.add('btn-disabled');
+                btn.disabled = true;
+              }
+            }
+          }).catch(function() {});
+        }
+      }
+
+      // 签到
+      function handleSignIn() {
+        var userName, userDept, userPhone;
+
+        if (currentUser) {
+          userName = currentUser.name;
+          userDept = currentUser.department || '';
+          userPhone = currentUser.mobile || currentUser.phone || 'manual_' + Date.now();
+        } else {
+          var nameInput = document.getElementById('manual-name');
+          var deptInput = document.getElementById('manual-dept');
+          userName = nameInput ? nameInput.value.trim() : '';
+          userDept = deptInput ? deptInput.value.trim() : '';
+          userPhone = 'manual_' + Date.now();
+
+          if (!userName) {
+            alert('请输入您的姓名');
+            return;
+          }
+        }
+
+        if (isSdkAvailable() && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.create('signed_users', {
+            name: userName,
+            phone: userPhone,
+            department: userDept,
+            signInTime: Date.now()
+          }).then(function() {
+            var btn = document.getElementById('signin-btn');
+            if (btn) {
+              btn.textContent = '已签到 ✓';
+              btn.classList.add('btn-disabled');
+              btn.disabled = true;
+            }
+
+            var nameInput = document.getElementById('manual-name');
+            var deptInput = document.getElementById('manual-dept');
+            if (nameInput) { nameInput.disabled = true; }
+            if (deptInput) { deptInput.disabled = true; }
+
+            // 广播签到消息
+            if (FsYxtMicroApp.broadcast) {
+              FsYxtMicroApp.broadcast({
+                type: 'user_signin',
+                data: { name: userName, department: userDept, phone: userPhone }
+              });
+            }
+
+            if (FsYxtMicroApp.track) {
+              FsYxtMicroApp.track(2036, '签到成功');
+            }
+            alert('签到成功！');
+          }).catch(function(err) {
+            alert('签到失败：' + (err.message || '未知错误'));
+          });
+        }
+      }
+
+      // 发送互动消息
+      function handleSendMessage() {
+        var textarea = document.getElementById('message-text');
+        var message = textarea.value.trim();
+        if (!message) return;
+
+        var senderName = currentUser ? currentUser.name : '匿名用户';
+
+        if (isSdkAvailable() && FsYxtMicroApp.broadcast) {
+          FsYxtMicroApp.broadcast({
+            type: 'user_message',
+            data: { name: senderName, message: message }
+          }).then(function() {
+            textarea.value = '';
+            addMessageToList(senderName, message);
+          }).catch(function() {
+            alert('发送失败');
+          });
+        }
+      }
+
+      // 添加消息到移动端列表
+      function addMessageToList(name, message) {
+        var list = document.getElementById('message-list');
+        if (!list) return;
+        var item = document.createElement('div');
+        item.className = 'message-item';
+        item.innerHTML = '<strong>' + name + '：</strong>' + message;
+        list.insertBefore(item, list.firstChild);
+      }
+
+      // ==================== PC端功能 ====================
+
+      // 加载签到用户列表
+      function loadSignedUsers() {
+        if (isSdkAvailable() && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.query('signed_users', {
+            orders: [{ field_name: 'signInTime', isAsc: false }],
+            pageSize: 100
+          }).then(function(result) {
+            signedUsers = result.data || [];
+            var countEl = document.getElementById('signin-count');
+            if (countEl) {
+              countEl.textContent = signedUsers.length;
+            }
+
+            var list = document.getElementById('pc-user-list');
+            if (list) {
+              if (signedUsers.length === 0) {
+                list.innerHTML = '<div class="user-list-item" style="text-align: center; color: var(--text-secondary);">暂无签到用户</div>';
+              } else {
+                list.innerHTML = signedUsers.map(function(user) {
+                  return '<div class="user-list-item">' +
+                    '<strong>' + user.name + '</strong>' +
+                    (user.department ? ' <span style="color: var(--text-secondary);">- ' + user.department + '</span>' : '') +
+                  '</div>';
+                }).join('');
+              }
+            }
+          }).catch(function() {});
+        }
+      }
+
+      // 抽奖
+      function handleLottery() {
+        if (signedUsers.length === 0) {
+          alert('暂无签到用户');
+          return;
+        }
+
+        // 获取当前奖项（第一个有剩余的奖项）
+        var currentPrize = null;
+        for (var i = 0; i < prizes.length; i++) {
+          if (prizes[i].remaining > 0) {
+            currentPrize = prizes[i];
+            break;
+          }
+        }
+
+        if (!currentPrize) {
+          alert('所有奖项已抽完');
+          return;
+        }
+
+        // 过滤未中奖的用户
+        var eligibleUsers = signedUsers.filter(function(user) {
+          return !winners.some(function(w) { return w.winnerPhone === user.phone; });
+        });
+
+        if (eligibleUsers.length === 0) {
+          alert('所有已签到用户均已中奖');
+          return;
+        }
+
+        // 随机抽取
+        var winner = eligibleUsers[Math.floor(Math.random() * eligibleUsers.length)];
+
+        // 保存中奖记录
+        if (isSdkAvailable() && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.create('winners', {
+            winnerName: winner.name,
+            winnerPhone: winner.phone,
+            winnerDepartment: winner.department || '',
+            prizeName: currentPrize.name,
+            winTime: Date.now()
+          }).then(function() {
+            // 更新奖项剩余数量
+            currentPrize.remaining--;
+            updatePrizeList();
+
+            // 显示中奖结果
+            var displayEl = document.getElementById('winner-display');
+            if (displayEl) {
+              displayEl.innerHTML =
+                '<div class="winner-name">' + winner.name + '</div>' +
+                '<div class="winner-prize">' + currentPrize.name + '</div>';
+            }
+
+            // 广播中奖消息
+            if (FsYxtMicroApp.broadcast) {
+              FsYxtMicroApp.broadcast({
+                type: 'lottery_result',
+                data: { winnerName: winner.name, prizeName: currentPrize.name, winnerPhone: winner.phone }
+              });
+            }
+
+            if (FsYxtMicroApp.track) {
+              FsYxtMicroApp.track(2036, winner.name + ' ' + currentPrize.name);
+            }
+
+            // 更新中奖名单
+            loadWinners();
+          }).catch(function(err) {
+            alert('保存中奖记录失败：' + (err.message || '未知错误'));
+          });
+        }
+      }
+
+      // 显示二维码
+      function showQRCode() {
+        var appId = getAppId();
+        var ea = getEnterpriseEA();
+        var qrUrl = 'https://crm.ceshi112.com/proj/page/marketing-microapp?ea=' + ea + '&appId=' + appId;
+        var qrCodeEl = document.getElementById('qr-code');
+        if (qrCodeEl) {
+          qrCodeEl.innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=' + encodeURIComponent(qrUrl) + '" alt="签到二维码" />';
+        }
+        document.getElementById('qr-modal').classList.add('active');
+      }
+
+      // 显示中奖名单
+      function showWinnersModal() {
+        loadWinners();
+        document.getElementById('winners-modal').classList.add('active');
+      }
+
+      // 添加奖项
+      function addPrize() {
+        var nameInput = document.getElementById('prize-name');
+        var countInput = document.getElementById('prize-count');
+        var name = nameInput ? nameInput.value.trim() : '';
+        var count = countInput ? parseInt(countInput.value) : 0;
+
+        if (!name || !count || count <= 0) {
+          alert('请输入有效的奖项名称和数量');
+          return;
+        }
+
+        prizes.push({ name: name, count: count, remaining: count });
+
+        if (nameInput) { nameInput.value = ''; }
+        if (countInput) { countInput.value = ''; }
+
+        updatePrizeList();
+      }
+
+      // 更新奖项列表显示
+      function updatePrizeList() {
+        var list = document.getElementById('prize-list');
+        if (list) {
+          list.innerHTML = prizes.map(function(p) {
+            return '<div class="prize-item">' +
+              '<span class="prize-name">' + p.name + '</span>' +
+              '<span class="prize-count">' + p.remaining + '/' + p.count + '</span>' +
+            '</div>';
+          }).join('');
+        }
+      }
+
+      // 加载中奖名单
+      function loadWinners() {
+        if (isSdkAvailable() && FsYxtMicroApp.db) {
+          FsYxtMicroApp.db.query('winners', {
+            orders: [{ field_name: 'winTime', isAsc: false }],
+            pageSize: 100
+          }).then(function(result) {
+            winners = result.data || [];
+            var countEl = document.getElementById('winner-count');
+            if (countEl) {
+              countEl.textContent = winners.length;
+            }
+
+            var list = document.getElementById('winners-list');
+            if (list) {
+              if (winners.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 40px;">暂无中奖记录</div>';
+              } else {
+                list.innerHTML = winners.map(function(w) {
+                  return '<div class="winner-item">' +
+                    '<div class="winner-name">' + w.winnerName + '</div>' +
+                    '<div class="winner-prize">' + w.prizeName + '</div>' +
+                  '</div>';
+                }).join('');
+              }
+            }
+          }).catch(function() {});
+        }
+      }
+
+      // 添加滚动消息到大屏
+      function addScrollMessage(name, message) {
+        var scroll = document.getElementById('pc-message-scroll');
+        if (!scroll) return;
+
+        var item = document.createElement('div');
+        item.className = 'message-scroll-item';
+        item.innerHTML = '<strong>' + name + '：</strong>' + message;
+        scroll.insertBefore(item, scroll.firstChild);
+
+        // 限制消息数量
+        while (scroll.children.length > 10) {
+          scroll.removeChild(scroll.lastChild);
+        }
+      }
+
+      // ==================== 消息监听（双端） ====================
+
+      function setupMessageListener() {
+        if (isSdkAvailable() && FsYxtMicroApp.onMessage) {
+          FsYxtMicroApp.onMessage(function(msg) {
+            if (!msg || !msg.type) return;
+
+            if (msg.type === 'user_signin') {
+              // PC端收到签到消息：刷新签到用户列表
+              if (platform === 'web') {
+                loadSignedUsers();
+              }
+            } else if (msg.type === 'user_message') {
+              // PC端收到互动消息：添加到滚动消息区域
+              if (platform === 'web' && msg.data) {
+                addScrollMessage(msg.data.name || '匿名用户', msg.data.message || '');
+              }
+            } else if (msg.type === 'lottery_result') {
+              // 移动端收到中奖通知：弹窗提示
+              if (platform === 'mobile' && currentUser && msg.data) {
+                var winnerName = msg.data.winnerName;
+                var currentUserName = currentUser.name;
+                if (winnerName === currentUserName) {
+                  alert('🎉 恭喜您获得 ' + msg.data.prizeName + '！');
+                }
+              }
+            }
+          });
+        }
+      }
+
+      // ==================== 事件绑定 ====================
+
+      function bindEvents() {
+        // 移动端按钮
+        var signinBtn = document.getElementById('signin-btn');
+        if (signinBtn) {
+          signinBtn.addEventListener('click', handleSignIn);
+        }
+
+        var sendMsgBtn = document.getElementById('send-message-btn');
+        if (sendMsgBtn) {
+          sendMsgBtn.addEventListener('click', handleSendMessage);
+        }
+
+        // PC端按钮
+        var lotteryBtn = document.getElementById('lottery-btn');
+        if (lotteryBtn) {
+          lotteryBtn.addEventListener('click', handleLottery);
+        }
+
+        var qrBtn = document.getElementById('show-qr-btn');
+        if (qrBtn) {
+          qrBtn.addEventListener('click', showQRCode);
+        }
+
+        var winnersBtn = document.getElementById('show-winners-btn');
+        if (winnersBtn) {
+          winnersBtn.addEventListener('click', showWinnersModal);
+        }
+
+        var addPrizeBtn = document.getElementById('add-prize-btn');
+        if (addPrizeBtn) {
+          addPrizeBtn.addEventListener('click', addPrize);
+        }
+      }
+
+      // ==================== 初始化 ====================
+
+      function init() {
+        if (platform === 'mobile') {
+          // 移动端初始化
+          loadUser();
+        } else {
+          // PC端初始化
+          loadSignedUsers();
+          loadWinners();
+          updatePrizeList();
+
+          // PC端定时刷新签到用户列表（每5秒）
+          setInterval(loadSignedUsers, 5000);
+
+          // PC端启动消息轮询（每3秒）
+          if (isSdkAvailable() && FsYxtMicroApp.startMessagePolling) {
+            FsYxtMicroApp.startMessagePolling(3000);
+          }
+        }
+
+        // 设置消息监听
+        setupMessageListener();
+
+        // 绑定事件
+        bindEvents();
+      }
+
+      // 启动应用
+      init();
+
+    })();
+  </script>
+</body>
+</html>
