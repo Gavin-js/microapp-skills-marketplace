@@ -639,6 +639,167 @@ FsYxtMicroApp.track(2036, '中了一等奖');
 
 ---
 
+## UI 设计规范
+
+所有微应用应遵循以下 UI 设计规范：
+
+### 基础规范
+
+```css
+:root {
+  /* 默认主题色 - 活力橙 */
+  --theme-color: #ff8000;
+  --theme-color-dark: #e67300;
+  --theme-color-light: #ff9933;
+
+  /* 默认圆角 */
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --border-radius-lg: 12px;
+
+  /* 间距系统 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* 字体大小 */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-xxl: 32px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+```
+
+### 主题色规范
+
+| 用途 | 颜色值 | 说明 |
+|------|--------|------|
+| 主色 | `#ff8000` | 默认主题色，用于主要按钮、强调文字、图标 |
+| 主色深色 | `#e67300` | 主色的深色版本，用于 hover 状态 |
+| 主色浅色 | `#ff9933` | 主色的浅色版本，用于背景、描边 |
+| 背景色 | `#ffffff` | 页面背景色 |
+| 卡片背景 | `#f8f8f8` | 卡片、列表项背景 |
+| 文字主色 | `#333333` | 主要文字颜色 |
+| 文字次色 | `#666666` | 次要文字颜色 |
+| 文字禁用 | `#999999` | 禁用状态文字 |
+| 边框色 | `#e5e5e5` | 边框、分割线 |
+| 成功色 | `#52c41a` | 成功状态 |
+| 警告色 | `#faad14` | 警告状态 |
+| 错误色 | `#f5222d` | 错误状态 |
+
+### 圆角规范
+
+| 用途 | 圆角值 |
+|------|--------|
+| 按钮 | `8px` |
+| 输入框 | `8px` |
+| 卡片 | `8px` |
+| 小元素（标签、徽章） | `4px` |
+| 大元素（弹窗、面板） | `12px` |
+
+### 组件样式示例
+
+**按钮**
+```css
+.button {
+  background-color: #ff8000;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  background-color: #e67300;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 128, 0, 0.3);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+```
+
+**输入框**
+```css
+.input {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  border-color: #ff8000;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 128, 0, 0.2);
+}
+```
+
+**卡片**
+```css
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+```
+
+### 响应式断点
+
+```css
+/* 移动端 */
+@media screen and (max-width: 768px) {
+  :root {
+    --font-size-md: 14px;
+    --font-size-lg: 18px;
+    --spacing-md: 12px;
+  }
+}
+
+/* 平板 */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --font-size-md: 15px;
+  }
+}
+
+/* PC端 */
+@media screen and (min-width: 1025px) {
+  :root {
+    --font-size-md: 16px;
+  }
+}
+```
+
+### 无障碍规范
+
+- 按钮、链接等可交互元素需要有明显的 `:focus` 状态
+- 颜色对比度需符合 WCAG 2.1 标准（文字与背景对比度至少 4.5:1）
+- 所有图片需要添加 `alt` 属性
+- 表单元素需要关联对应的 `label` 标签
+
+---
+
 ## 设计风格
 
 ### 风格 A：赛博霓虹脉冲 (cyber)
@@ -1606,6 +1767,7 @@ FsYxtMicroAppMockUtils.reload();
 
 | 版本 | 日期 | 变更说明 |
 |------|------|----------|
+| 1.0.10 | 2026-03-09 | 🔥 重要更新：新增UI设计规范，主题色默认#ff8000、圆角默认8px，包含基础规范、主题色规范、圆角规范、组件样式示例、响应式断点、无障碍规范 |
 | 1.0.9 | 2026-03-09 | 🔥 重要更新：会议签到类型新增3D签到球效果（PC端），参会者扫码后头像实时飞入大屏带粒子特效，移动端签到支持自动填充或手动输入选择，新增完整CTA SDK使用说明 |
 | 1.0.8 | 2026-03-06 | 🔥 重要更新：新增应用类型 `lottery`（抽奖应用），与会议无关的纯抽奖活动。优化会议签到抽奖/签到类型：新增两种实现方式（默认方式/系统对接方式），系统对接方式使用 `campaignMembers` API 和 `conferenceSignIn` API。新增 CTA 引导集成支持（抽奖应用） |
 | 1.0.7 | 2026-02-28 | 优化 URL 参数获取：移除询问用户"微应用访问地址"步骤，改为自动从 URL 中获取 `ea`、`appId`、`marketingEventId` 等参数。新增 URL 参数获取说明、代码示例及地址拼接规则（供 AI 参考） |
