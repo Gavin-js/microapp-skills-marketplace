@@ -338,6 +338,123 @@ FsYxtMicroApp.conferenceSignIn({ contact: '13800138000' })
 **前置要求：**
 - 需在 URL 业务参数中设置 `marketingEventId`，例如：`?ea=88146&appId=xxx&marketingEventId=event_123`
 
+### CTA 引导
+
+CTA（Call To Action）SDK 用于在网页中嵌入引导组件，用户完成引导后才能参与抽奖。
+
+**1. 引入 SDK**
+
+在 HTML 文件中引入 CTA SDK：
+```html
+<script src="https://www.fxiaoke.com/ec/h5-landing/release/ctaSDK-1.0.0.js"></script>
+```
+
+**2. 基本用法**
+
+```javascript
+// 获取 ctaId（优先从业务参数获取，否则使用默认值）
+var ctaId = FsYxtMicroApp.getParam('ctaId') || 'default-cta-id';
+
+// 创建 CTA 实例
+var cta = FsYxt.CtaSDK({
+    ctaId: ctaId
+});
+
+// 监听准备就绪事件
+cta.onReady(function() {
+    console.log('CTA 组件已准备就绪');
+});
+
+// 监听错误事件
+cta.onError(function(error) {
+    console.error('CTA 错误：', error);
+});
+
+// 监听引导完成事件（抽奖应用需要用到）
+cta.onActionComplete(function() {
+    console.log('引导完成，解锁抽奖功能');
+    // 显示抽奖界面或启用抽奖按钮
+    document.getElementById('lottery-section').style.display = 'block';
+});
+
+// 手动触发 CTA（可选，取决于 autoExecuteOnReady 配置）
+// cta.start();
+```
+
+**3. 抽奖应用完整流程示例**
+
+```javascript
+// 页面加载完成后初始化
+window.addEventListener('load', function() {
+    // 检查是否需要 CTA 引导
+    var ctaId = FsYxtMicroApp.getParam('ctaId');
+
+    if (ctaId) {
+        // 需要 CTA 引导
+        var cta = FsYxt.CtaSDK({
+            ctaId: ctaId,
+            autoExecuteOnReady: true,
+            marketingEventId: FsYxtMicroApp.getParam('marketingEventId')
+        });
+
+        // 隐藏抽奖区域，等待 CTA 完成
+        document.getElementById('lottery-section').style.display = 'none';
+
+        cta.onReady(function() {
+            console.log('CTA 已就绪');
+        });
+
+        cta.onActionComplete(function() {
+            console.log('CTA 引导完成，解锁抽奖');
+            // 显示抽奖区域
+            document.getElementById('lottery-section').style.display = 'block';
+            // 启用抽奖按钮
+            document.getElementById('lottery-btn').disabled = false;
+        });
+
+        cta.onError(function(error) {
+            console.error('CTA 出错：', error);
+            // CTA 出错时仍显示抽奖（降级处理）
+            document.getElementById('lottery-section').style.display = 'block';
+        });
+    } else {
+        // 不需要 CTA，直接显示抽奖
+        document.getElementById('lottery-section').style.display = 'block';
+    }
+});
+```
+
+**4. 构造函数选项**
+
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| ctaId | string | 是 | - | CTA 组件的唯一标识 |
+| hideEntryBtn | boolean | 否 | false | 是否隐藏默认引导按钮 |
+| autoExecuteOnReady | boolean | 否 | true | 是否在准备就绪后自动执行 |
+| marketingEventId | string | 否 | - | 市场活动 ID |
+| buttonId | string | 否 | - | 自定义触发按钮的 ID |
+| actionStyle | object | 否 | - | 样式配置对象 |
+
+**5. 样式配置选项**
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| position | string | 'center' | 组件弹出位置：'center'（居中）、'bottom-right'（右下角） |
+| maskOpacity | number | 0.6 | 遮罩层透明度，取值范围 0-1 |
+| width | string | '280px' | 表单弹窗宽度，支持 px、%、vw 等单位 |
+| borderRadius | string | '6px' | 弹层圆角 |
+
+**6. 实例方法**
+
+| 方法 | 说明 |
+|------|------|
+| onReady(callback) | 监听组件准备就绪事件 |
+| onError(callback) | 监听错误事件 |
+| start() | 手动触发 CTA 引导组件 |
+| onActionComplete(callback) | 监听引导完成事件 |
+| onActionStep(callback) | 监听引导步骤事件 |
+| destroy() | 销毁 CTA 实例 |
+
 ### 消息广播
 
 ```javascript
