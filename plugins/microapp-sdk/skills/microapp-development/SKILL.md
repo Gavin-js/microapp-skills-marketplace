@@ -58,7 +58,7 @@ graph LR
    - 需确认：**奖项设置**（一等奖1名、二等奖3名...）
    - 需确认：**实现方式**：
      - ✅ **默认方式**：在数据库中新建签到人员表，自主管理签到和抽奖数据
-     - ⬜ **系统对接方式**：调用活动成员API（`FsYxtMicroApp.campaignMembers`）查询系统参会人员，使用会议签到API（`FsYxtMicroApp.conferenceSignIn`）进行签到
+     - ⬜ **系统对接方式**：调用参会人员API（`FsYxtMicroApp.queryConferenceParticipants`）查询系统参会人员，使用会议签到API（`FsYxtMicroApp.conferenceSignIn`）进行签到
 
    **会议签到 (`signin`) - 默认功能**：
    - ✅ 会议签到（用户信息自动填充/手动输入）
@@ -1577,7 +1577,7 @@ document.getElementById('qr-code').innerHTML = '<img src="' + qrCodeUrl + '" alt
 - **奖项设置**：有哪些奖项？每个奖项多少名额？（如：一等奖1名、二等奖3名、三等奖10名）
 - **实现方式**：
   - ✅ **默认方式**：在数据库中新建签到人员表，自主管理签到和抽奖数据
-  - ⬜ **系统对接方式**：调用活动成员API（`FsYxtMicroApp.campaignMembers`）查询系统参会人员，使用会议签到API（`FsYxtMicroApp.conferenceSignIn`）进行签到
+  - ⬜ **系统对接方式**：调用参会人员API（`FsYxtMicroApp.queryConferenceParticipants`）查询系统参会人员，使用会议签到API（`FsYxtMicroApp.conferenceSignIn`）进行签到
 
 **默认规则**（行业实践）：
 - 参与人员：所有已签到用户
@@ -1775,7 +1775,7 @@ FsYxtMicroAppMockUtils.reload();
 |------|------|----------|
 | 1.0.10 | 2026-03-09 | 🔥 重要更新：新增UI设计规范，主题色默认#ff8000、圆角默认8px。新增会议签到类型3D签到球效果和头像飞入动画。会议签到类型新增是否集成CTA引导确认 |
 | 1.0.9 | 2026-03-09 | 🔥 重要更新：会议签到类型新增3D签到球效果（PC端），参会者扫码后头像实时飞入大屏带粒子特效，移动端签到支持自动填充或手动输入选择，新增完整CTA SDK使用说明 |
-| 1.0.8 | 2026-03-06 | 🔥 重要更新：新增应用类型 `lottery`（抽奖应用），与会议无关的纯抽奖活动。优化会议签到抽奖/签到类型：新增两种实现方式（默认方式/系统对接方式），系统对接方式使用 `campaignMembers` API 和 `conferenceSignIn` API。新增 CTA 引导集成支持（抽奖应用） |
+| 1.0.8 | 2026-03-06 | 🔥 重要更新：新增应用类型 `lottery`（抽奖应用），与会议无关的纯抽奖活动。优化会议签到抽奖/签到类型：新增两种实现方式（默认方式/系统对接方式），系统对接方式使用 `queryConferenceParticipants` API 和 `conferenceSignIn` API。新增 CTA 引导集成支持（抽奖应用） |
 | 1.0.7 | 2026-02-28 | 优化 URL 参数获取：移除询问用户"微应用访问地址"步骤，改为自动从 URL 中获取 `ea`、`appId`、`marketingEventId` 等参数。新增 URL 参数获取说明、代码示例及地址拼接规则（供 AI 参考） |
 | 1.0.6 | 2026-02-28 | 🔥 重要更新：优化应用类型分类，新增 `lottery-signin`（会议签到抽奖）和 `signin`（会议签到）两种类型。明确各场景标准功能清单：抽奖含6大功能模块、签到含4大功能模块（突出签到用户列表展示）。新增微应用访问地址格式说明 |
 | 1.0.5 | 2026-02-28 | 🔥 重要更新：优化文档结构，强调工作流程。在文档开头添加重要提示和快速开始章节，将需求确认步骤前置，防止 AI 助手跳过需求确认直接生成代码 |

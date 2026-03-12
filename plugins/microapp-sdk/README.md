@@ -85,23 +85,20 @@ const createUser = (name, email) => ({ name, email });
 
 ## API 文档
 
-### CRM 对象操作
+### 参会人员操作
 
 ```javascript
-// 创建记录
-FsYxtMicroApp.campaignMembers.create({
-  name: '张三',
-  phone: '13800138000',
-  status: '已签到'
+// 查询参会人员列表
+FsYxtMicroApp.queryConferenceParticipants({
+  marketingEventId: 'your_event_id',
+  pageNum: 1,
+  pageSize: 100,
+  reviewStatus: 'approved', // 审批状态
+  signStatus: 'signed',    // 签到状态
+  keyword: ''              // 关键字搜索
+}).then(function(result) {
+  console.log('参会人员列表：', result.data);
 });
-
-// 查询记录
-FsYxtMicroApp.campaignMembers.query({
-  filter: { status: '已签到' }
-});
-
-// 更新记录
-FsYxtMicroApp.campaignMembers.update(id, { status: '已中奖' });
 ```
 
 ### 用户操作
