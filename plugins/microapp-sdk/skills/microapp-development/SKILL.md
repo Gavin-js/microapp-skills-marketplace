@@ -338,8 +338,59 @@ FsYxtMicroApp.conferenceSignIn({ contact: '13800138000' })
   });
 ```
 
+### 参会人员查询
+
+查询营销活动（会议）的参会人员列表，用于系统对接方式获取系统参会数据。
+
+```javascript
+// 查询参会人员列表
+// 参数：
+// - marketingEventId: 营销活动ID（必填，可从 URL 参数获取）
+// - pageNum: 页码，默认1
+// - pageSize: 每页数量，默认10，最大100
+// - reviewStatus: 审批状态（可选）：pending（待审批）、approved（已通过）、rejected（已拒绝）
+// - signStatus: 签到状态（可选）：not_signed（未签到）、signed（已签到）
+// - keyword: 关键字搜索（可选），支持姓名、手机号模糊匹配
+// - filterPhoneUser: 是否过滤已绑定手机的用户（可选）：true/false，默认false
+
+FsYxtMicroApp.queryConferenceParticipants({
+  marketingEventId: FsYxtMicroApp.getParam('marketingEventId'),
+  pageNum: 1,
+  pageSize: 100,
+  reviewStatus: 'approved',    // 只查询已通过审批的
+  signStatus: 'signed',        // 只查询已签到的
+  keyword: '',
+  filterPhoneUser: false
+})
+  .then(function(result) {
+    console.log('参会人员列表：', result.data);
+    // 返回格式：{ data: [...], total: 100, pageNum: 1, pageSize: 100 }
+  })
+  .catch(function(err) {
+    console.error('查询失败：', err);
+  });
+```
+
+**返回数据字段说明：**
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| id | string | 参会人员ID |
+| name | string | 姓名 |
+| phone | string | 手机号 |
+| email | string | 邮箱 |
+| company | string | 公司 |
+| position | string | 职位 |
+| reviewStatus | string | 审批状态 |
+| signStatus | string | 签到状态 |
+| signInTime | string | 签到时间 |
+
 **前置要求：**
-- 需在 URL 业务参数中设置 `marketingEventId`，例如：`?ea=88146&appId=xxx&marketingEventId=event_123`
+- 需在 URL 业务参数中设置 `marketingEventId`
+
+**典型应用场景：**
+1. 会议签到抽奖：查询已签到人员作为抽奖池
+2. 参会人员统计：查询已报名人员列表
+3. 签到状态查询：实时获取签到情况
 
 ### CTA 引导
 
