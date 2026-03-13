@@ -348,23 +348,23 @@ FsYxtMicroApp.conferenceSignIn({ contact: '13800138000' })
 // - marketingEventId: 营销活动ID（必填，可从 URL 参数获取）
 // - pageNum: 页码，默认1
 // - pageSize: 每页数量，默认10，最大100
-// - reviewStatus: 审批状态（可选）：pending（待审批）、approved（已通过）、rejected（已拒绝）
-// - signStatus: 签到状态（可选）：not_signed（未签到）、signed（已签到）
+// - reviewStatus: 审核状态（可选，数组）：0 待审核，1 审核成功，2 审核失败
+// - signStatus: 签到状态（可选，数组）：2 已签到，3 未签到
 // - keyword: 关键字搜索（可选），支持姓名、手机号模糊匹配
-// - filterPhoneUser: 是否过滤已绑定手机的用户（可选）：true/false，默认false
+// - filterPhoneUser: 是否过滤无手机号用户（可选）：true/false，默认 false
 
 FsYxtMicroApp.queryConferenceParticipants({
   marketingEventId: FsYxtMicroApp.getParam('marketingEventId'),
   pageNum: 1,
   pageSize: 100,
-  reviewStatus: 'approved',    // 只查询已通过审批的
-  signStatus: 'signed',        // 只查询已签到的
+  reviewStatus: [1],    // 只查询审核成功的
+  signStatus: [2],      // 只查询已签到的
   keyword: '',
   filterPhoneUser: false
 })
   .then(function(result) {
-    console.log('参会人员列表：', result.data);
-    // 返回格式：{ data: [...], total: 100, pageNum: 1, pageSize: 100 }
+    console.log('参会人员列表：', result.result);
+    // 返回格式：{ pageNum: 1, pageSize: 100, totalCount: 100, result: [...] }
   })
   .catch(function(err) {
     console.error('查询失败：', err);
@@ -380,8 +380,8 @@ FsYxtMicroApp.queryConferenceParticipants({
 | email | string | 邮箱 |
 | company | string | 公司 |
 | position | string | 职位 |
-| reviewStatus | string | 审批状态 |
-| signStatus | string | 签到状态 |
+| reviewStatus | number | 审核状态（0 待审核，1 审核成功，2 审核失败） |
+| signStatus | number | 签到状态（2 已签到，3 未签到） |
 | signInTime | string | 签到时间 |
 
 **前置要求：**
