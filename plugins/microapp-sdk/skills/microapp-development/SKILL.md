@@ -910,66 +910,75 @@ FsYxtMicroApp.track(2036, '中了一等奖');
 
 ### 动画与渲染性能规范
 
-> **重要提示**：所有动画必须遵循以下性能约束，确保在移动设备和低端设备上流畅运行。
+> **重要提示**：为了保证 H5 性能和高帧率体验（如 3D 签到球、抽奖滚动、头像飞入），生成的 CSS 动画必须遵循以下性能优化原则。
 
-**1. 硬件加速原则**：
+**1. 硬件加速（必须遵守）⚠️**：
+> 所有位移、缩放动画**必须**使用 `transform`（如 `translate3d()` 或 `translateZ(0)`），**绝对禁止**通过修改 `top`、`left`、`width` 或 `height` 触发重排（Reflow）。
+
 ```css
-/* ✅ 使用 transform 和 opacity 实现动画（GPU 加速） */
-.animated-element {
-  transform: translate3d(0, 0, 0);
+/* ✅ 正确：使用 transform 实现 GPU 加速 */
+.avatar-fly-in {
+  transform: translate3d(0, 0, 0);  /* 强制 GPU 加速 */
+  transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.avatar-fly-in.animate {
+  transform: translate3d(100px, 200px, 0);  /* 位移动画 */
+}
+
+/* ❌ 错误：使用 top/left 触发 CPU 渲染 */
+.bad-animation {
+  left: 100px;  /* 禁止！会导致重排，性能极差 */
+  top: 200px;   /* 禁止！ */
+}
+```
+
+**2. 透明度动画（必须遵守）⚠️**：
+> 淡入淡出**必须且只能**操作 `opacity` 属性，**禁止**使用 `display: none` 或 `visibility: hidden` 做动画过渡。
+
+```css
+/* ✅ 正确：使用 opacity 实现淡入淡出 */
+.fade-element {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.fade-element.show {
   opacity: 1;
-  transition: transform var(--duration-normal) var(--ease-smooth),
-              opacity var(--duration-normal) var(--ease-smooth);
 }
 
-/* ❌ 避免 top/left/width/height 动画（CPU 渲染，性能差） */
-.bad-animated {
-  left: 100px;  /* 避免 */
-  width: 200px; /* 避免 */
+/* ❌ 错误：display 无法做过渡动画 */
+.bad-fade {
+  display: none;  /* 禁止！display 属性无法产生过渡动画 */
 }
 ```
 
-**2. 动画曲线选择**：
+**3. 图层隔离（高频动画）⚠️**：
+> 对于执行高频动画的元素（如飞入的粒子、抽奖转盘、3D 签到球），**必须**通过 `will-change: transform` 或 `transform: translateZ(0)` 将其提升为独立渲染层，避免重绘。
+
 ```css
-/* 优雅的进入动画 */
-.fade-in {
-  animation: fadeIn var(--duration-normal) var(--ease-smooth) forwards;
+/* 高频动画元素（粒子、飞入头像等） */
+.particle, .flying-avatar {
+  /* 方式1：使用 will-change 提示浏览器优化 */
+  will-change: transform;
+
+  /* 方式2：强制 GPU 合成层（兼容性更好） */
+  transform: translateZ(0);
 }
 
-/* 弹性强调效果 */
-.bounce-in {
-  animation: bounceIn var(--duration-slower) var(--ease-spring) forwards;
-}
-
-/* 线性过渡（用于数值变化） */
-.linear-transition {
-  transition: all var(--duration-normal) ease;
-}
-```
-
-**3. 关键帧动画优化**：
-```css
-/* 使用 will-change 提示浏览器优化 */
-.will-animate {
-  will-change: transform, opacity;
-}
-
-/* 动画结束后移除 will-change */
-.animated {
-  animation: slideIn var(--duration-normal) var(--ease-smooth);
-}
-.animated.animation-finished {
+/* 动画结束后记得清理，避免内存占用 */
+.particle.finished {
   will-change: auto;
 }
 ```
 
 **4. 性能约束清单**：
 - ✅ 动画元素不超过 100 个（粒子效果控制在 50 个以内）
-- ✅ 复杂动画使用 requestAnimationFrame 实现
+- ✅ 复杂动画使用 `requestAnimationFrame` 实现
 - ✅ 大量元素渲染使用虚拟滚动或分页加载
 - ✅ 图片资源使用 WebP 格式，提供多个分辨率
-- ✅ 避免在动画中使用 box-shadow 和 filter（考虑降级方案）
-- ✅ 移动端禁用非关键动画（使用 prefers-reduced-motion 媒体查询）
+- ✅ 避免在动画中使用 `box-shadow` 和 `filter`（考虑降级方案）
+- ✅ 移动端禁用非关键动画（使用 `prefers-reduced-motion` 媒体查询）
 
 **5. 移动端性能优化**：
 ```css
