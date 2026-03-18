@@ -366,8 +366,8 @@ FsYxtMicroApp.object.query('CampaignBudgetObj', {
   pageSize: 100,
   pageNum: 1
 }).then(function(result) {
-  console.log('总记录数:', result.total);
-  console.log('记录列表:', result.data);
+  console.log('总记录数:', result.totalCount);
+  console.log('记录列表:', result.dataList);
 });
 ```
 
