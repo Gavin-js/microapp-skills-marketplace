@@ -1,7 +1,7 @@
 {
   "name": "microapp-sdk",
-  "version": "1.0.7",
-  "description": "营销通微应用开发 SDK 技能。提供完整的开发规范、API 参考和最佳实践，帮助 AI 快速生成符合规范的微应用代码。支持双端联动、实时消息同步、手动输入降级方案、用户类型区分。🔥 v1.0.7 优化 URL 参数获取，自动从 URL 获取 ea/appId/marketingEventId。",
+  "version": "1.0.17",
+  "description": "营销通微应用开发 SDK 技能。提供完整的开发规范、API 参考和最佳实践，帮助 AI 快速生成符合规范的微应用代码。支持双端联动、实时消息同步、手动输入降级方案、用户类型区分。🔥 v1.0.17 更新技能文档和版本。",
   "author": {
     "name": "Gavin-js",
     "email": "gavin@example.com",
