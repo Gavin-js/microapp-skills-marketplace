@@ -310,6 +310,189 @@ safeApiCall(FsYxtMicroApp.getCurrentUser, null).then(function(user) {
 
 ## API 参考
 
+### CRM 对象操作
+
+> **使用方式**：`FsYxtMicroApp.object`，其中 `objectType` 参数就是 CRM 对象的 `apiName`（如 `CampaignBudgetObj`、`CampaignMembersObj` 等）
+
+#### 创建记录：`FsYxtMicroApp.object.create(objectType, data)`
+
+在指定 CRM 对象中创建一条记录。
+
+```javascript
+// 创建费用记录
+FsYxtMicroApp.object.create('CampaignBudgetObj', {
+  description: '宣传费',
+  category: '宣传费',
+  amount: 1000.00,
+  status: '待提交',
+  createDate: Date.now()
+}).then(function(result) {
+  console.log('创建成功，记录ID:', result.data && result.data.id);
+});
+```
+
+**参数：**
+- `objectType` (String)：对象类型，即 CRM 对象的 `apiName`
+  - 如：`CampaignBudgetObj`（市场活动费用对象）
+  - 如：`CampaignMembersObj`（活动成员对象）
+  - 如：`LotteryRecordObj`（中奖记录对象）
+- `data` (Object)：记录字段数据
+
+**返回：**
+- Promise(Object)：创建结果，包含新建记录的 `id` 等信息
+
+---
+
+#### 查询记录：`FsYxtMicroApp.object.query(objectType, query)`
+
+查询指定 CRM 对象的记录列表。
+
+```javascript
+// 查询所有待审批的费用
+FsYxtMicroApp.object.query('CampaignBudgetObj', {
+  filters: [
+    {
+      field_name: 'status',
+      operator: 'EQ',
+      field_values: ['待审批']
+    }
+  ],
+  orders: [
+    {
+      field_name: 'createDate',
+      isAsc: false
+    }
+  ],
+  pageSize: 100,
+  pageNum: 1
+}).then(function(result) {
+  console.log('总记录数:', result.total);
+  console.log('记录列表:', result.data);
+});
+```
+
+**参数：**
+- `objectType` (String)：对象类型（CRM 对象的 `apiName`）
+- `query` (Object)：查询条件
+  - `filters` (Array)：过滤条件列表（新格式）
+    - `field_name`：字段名
+    - `operator`：操作符（`EQ` 等于 / `IN` 包含 / `LIKE` 模糊匹配）
+    - `field_values`：字段值数组
+  - `orders` (Array)：排序条件列表
+    - `field_name`：排序字段
+    - `isAsc`：是否升序
+  - `fields` (Array)：需要返回的字段列表（可选）
+  - `pageSize` (Number)：每页数量（默认 100）
+  - `pageNum` (Number)：页码（从 1 开始，默认 1）
+
+**返回：**
+- Promise(Object)：查询结果
+  - `data`：记录列表
+  - `total`：总记录数
+
+---
+
+#### 更新记录：`FsYxtMicroApp.object.update(objectType, id, data)`
+
+更新指定记录的部分字段。
+
+```javascript
+// 更新费用状态为"已批准"
+FsYxtMicroApp.object.update('CampaignBudgetObj', 'record_id_123', {
+  status: '已批准',
+  approveTime: Date.now()
+}).then(function(result) {
+  console.log('更新成功');
+});
+```
+
+**参数：**
+- `objectType` (String)：对象类型（CRM 对象的 `apiName`）
+- `id` (String)：记录 ID
+- `data` (Object)：要更新的字段
+
+**返回：**
+- Promise(Object)：更新结果
+
+---
+
+#### 删除记录：`FsYxtMicroApp.object.delete(objectType, id)`
+
+删除指定记录（具体是软删还是硬删由后端决定）。
+
+```javascript
+// 删除费用记录
+FsYxtMicroApp.object.delete('CampaignBudgetObj', 'record_id_123')
+  .then(function(result) {
+    console.log('删除成功');
+  });
+```
+
+**参数：**
+- `objectType` (String)：对象类型（CRM 对象的 `apiName`）
+- `id` (String)：记录 ID
+
+**返回：**
+- Promise(Object)：删除结果
+
+---
+
+#### 获取对象描述：`FsYxtMicroApp.object.describe(objectType)`
+
+获取对象的元数据信息，包括字段列表、字段类型、是否必填等，用于动态表单生成、数据校验等场景。
+
+```javascript
+// 获取费用对象的字段描述
+FsYxtMicroApp.object.describe('CampaignBudgetObj').then(function(schema) {
+  console.log('对象名称:', schema.objectLabel);
+  console.log('字段列表:', schema.fields);
+
+  // 根据字段信息动态生成表单
+  for (var i = 0; i < schema.fields.length; i++) {
+    var field = schema.fields[i];
+    if (!field.readonly) {
+      console.log('字段: ' + field.label + ' (' + field.name + ')');
+      console.log('  类型: ' + field.type);
+      console.log('  必填: ' + field.required);
+    }
+  }
+});
+```
+
+**参数：**
+- `objectType` (String)：对象类型（CRM 对象的 `apiName`）
+
+**返回：**
+- Promise(Object)：对象描述信息
+  - `fields`：字段列表，每个字段包含：
+    - `name`：字段名称
+    - `type`：字段类型（如：`'string'`、`'number'`、`'date'`、`'boolean'` 等）
+    - `label`：字段显示名称
+    - `required`：是否必填
+    - `readonly`：是否只读
+    - 其他字段属性
+  - `objectLabel`：对象显示名称
+  - `objectName`：对象名称
+  - 其他元数据
+
+---
+
+**与数据库操作的区别：**
+
+| 特性 | CRM 对象操作 (`object.*`) | 数据库操作 (`db.*`) |
+|------|--------------------------|-------------------|
+| **适用场景** | 操作 CRM 系统的标准业务对象 | 存储微应用自定义数据 |
+| **数据来源** | CRM 系统的业务数据表 | 微应用独立的数据库表 |
+| **对象类型** | 使用 `apiName`（如 `CampaignBudgetObj`） | 自定义表名（如 `lottery_winners`） |
+| **字段约束** | 由 CRM 对象定义决定 | 完全自定义 |
+| **数据共享** | 可被其他应用/模块访问 | 仅当前微应用可访问 |
+
+**使用建议：**
+- 如果需要存储与 CRM 业务相关的数据（如活动成员、费用记录），使用 **CRM 对象操作**
+- 如果需要存储微应用内部的临时数据或自定义结构，使用 **数据库操作**
+
+---
+
 ### 数据库操作
 
 ```javascript
@@ -2930,6 +3113,7 @@ FsYxtMicroAppMockUtils.reload();
 
 | 版本 | 日期 | 变更说明 |
 |------|------|----------|
+| 1.0.18 | 2026-03-18 | 🔥 重要更新：新增 CRM 对象操作 API 文档。完整添加 `FsYxtMicroApp.object` 的五个方法说明（create、query、update、delete、describe），包含详细的参数说明、返回值、ES5 代码示例，以及与数据库操作的对比表格。使用方式：`FsYxtMicroApp.object`，其中 `objectType` 就是 CRM 对象的 `apiName`（如 `CampaignBudgetObj`） |
 | 1.0.17 | 2026-03-17 | 🎨 设计系统全面升级：1) 新增"动画与渲染性能规范"章节，包含硬件加速原则、动画曲线选择、关键帧优化、性能约束清单、移动端降级方案；2) 完善基础规范，升级为现代设计令牌系统（包含品牌色阶、文本对比度、毛玻璃效果、阴影层级、间距系统、相对字体、动画曲线、Z-index）；3) 大幅增强设计风格参考代码，赛博霓虹/东方水墨/晶体折射/庆典纸屑四种风格均提供完整可直接复制的 CSS 实现，包含卡片、按钮、输入框、装饰元素等组件样式 |
 | 1.0.16 | 2026-03-17 | 🎨 设计优化：新增 UI 设计原则章节，强调字体图标使用节制。每个页面/模块图标控制在 3-5 个以内，装饰性元素使用 CSS 而非图标，避免界面像 AI 自动生成的廉价模板。代码验证新增 UI 设计自查项 |
 | 1.0.15 | 2026-03-17 | 优化：移除中奖偏好设置的快捷键触发方式，保留点击标题和右键菜单两种触发方式 |
