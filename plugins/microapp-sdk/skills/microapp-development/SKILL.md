@@ -805,6 +805,76 @@ FsYxtMicroApp.db.update('tableName', id, data);
 FsYxtMicroApp.db.delete('tableName', id);
 ```
 
+### 大模型 API
+
+> **使用方式**：`FsYxtMicroApp.llm(options)`，支持流式响应返回生成内容
+
+调用大模型 API，支持流式响应返回生成内容。采用 SSE (Server-Sent Events) 流式响应。
+
+```javascript
+// 基本调用
+var controller = FsYxtMicroApp.llm({
+  model: 'qwen-turbo',
+  messages: [
+    {role: 'user', content: '你好'}
+  ],
+  onMessage: function(data) {
+    console.log('收到消息:', data.message);
+  },
+  onFinish: function(data) {
+    console.log('生成完成:', data.message);
+  },
+  onError: function(err) {
+    console.error('调用失败:', err);
+  }
+});
+
+// 取消请求
+// controller.abort();
+
+// 会话对话示例
+var conversationHistory = [
+  {role: 'system', content: '你是一个有用的助手'},
+  {role: 'user', content: '什么是人工智能？'}
+];
+
+FsYxtMicroApp.llm({
+  model: 'qwen-turbo',
+  messages: conversationHistory,
+  onFinish: function(data) {
+    console.log('AI 回答:', data.message);
+    // 将 AI 回答加入对话历史
+    conversationHistory.push({role: 'assistant', content: data.message});
+  }
+});
+```
+
+**参数：**
+- `options` (Object)：调用选项
+  - `model` (String)：模型名称，如 `'qwen-turbo'`、`'qwen-plus'` 等（**必填**）
+  - `messages` (Array)：消息数组（**必填**），格式：`[{role: 'user', content: '你好'}]`
+    - 支持的消息角色：`'system'`（系统）、`'user'`（用户）、`'assistant'`（助手）
+  - `onMessage` (Function)：消息回调函数，接收参数 `{message, reason}`（可选）
+  - `onFinish` (Function)：完成回调函数，接收参数 `{message, reason}`（可选）
+  - `onError` (Function)：错误回调函数（可选）
+
+**返回：**
+- Object：包含 `abort()` 方法的对象，用于取消请求
+
+**流式响应说明：**
+- API 采用 SSE (Server-Sent Events) 流式响应
+- 响应事件类型：
+  - `event: data`：中间生成的消息片段，通过 `onMessage` 回调
+  - `event: finish`：最终完成消息，通过 `onFinish` 回调
+- 每个消息数据包含：
+  - `message` (String)：生成的文本内容
+  - `reason` (String)：推理原因（可能为空）
+
+**注意事项：**
+- `model` 和 `messages` 为必填参数
+- `messages` 数组中的消息对象必须包含 `role` 和 `content` 字段
+- 请求可以通过返回的 `controller.abort()` 方法取消
+
 ### 其他 API
 
 ```javascript
