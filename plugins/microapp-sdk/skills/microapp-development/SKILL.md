@@ -387,8 +387,8 @@ FsYxtMicroApp.object.query('CampaignBudgetObj', {
 
 **返回：**
 - Promise(Object)：查询结果
-  - `data`：记录列表
-  - `total`：总记录数
+  - `dataList`：记录列表
+  - `totalCount`：总记录数
 
 ---
 
