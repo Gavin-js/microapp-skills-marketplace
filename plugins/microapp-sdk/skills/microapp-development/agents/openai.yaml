@@ -1,0 +1,4 @@
+interface:
+  display_name: "微应用开发"
+  short_description: "营销通微应用开发与调试工作流、SDK 规范和设计参考"
+  default_prompt: "Use $microapp-development to design or implement a marketing microapp with the right workflow, storage, SDK APIs, and UI style."
